@@ -1,7 +1,8 @@
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
+public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
 {
     private static final int DEFAULT_CAPACITY = 64;
     Entry<K,V>[] table;
@@ -32,13 +33,28 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @Override
     public V get(K key)
     {
-        return null;
+        Iterator<Dictionary.Entry<K, V>> it = iterator();
+
+        while(it.hasNext()) {
+
+        }
+
+        if(!item.key.equals(key)) {
+
+        }
+
+        return item.value;
     }
     
     @Override
     public boolean contains(K key)
     {
-        return false;
+        try {
+            get(key);
+            return true;
+        } catch(Exception e) {
+            return false;
+        }
     }
     
     @Override
@@ -63,7 +79,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @Override
     public Iterator<Dictionary.Entry<K, V>> iterator()
     {
-        return null;
+        return new HashIterator();
     }
     
     private void doubleCapacity()
@@ -98,6 +114,34 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         public V getValue()
         {
             return value;
+        }
+    }
+
+    private class HashIterator implements Iterator<Dictionary.Entry<K, V>> {
+        private int i;
+
+        public HashIterator() {
+            this.i = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            while(i < table.length) {
+                if(table[i] != null) {
+                    return true;
+                }
+                i++;
+            }
+
+            return false;
+        }
+
+        @Override
+        public Entry<K, V> next() {
+            if(!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return table[i];
         }
     }
 }
