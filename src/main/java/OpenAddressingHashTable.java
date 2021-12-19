@@ -31,19 +31,18 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     }
     
     @Override
-    public V get(K key)
+    public V get(K key) throws Exception
     {
         Iterator<Dictionary.Entry<K, V>> it = iterator();
 
         while(it.hasNext()) {
-
+            Dictionary.Entry<K, V> item = it.next();
+            if(item.getKey().equals(key)) {
+                return item.getValue();
+            }
         }
 
-        if(!item.key.equals(key)) {
-
-        }
-
-        return item.value;
+        throw new Exception();
     }
     
     @Override
