@@ -31,18 +31,18 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     }
     
     @Override
-    public V get(K key) throws Exception
+    public V get(K key) throws NoSuchElementException
     {
-        Iterator<Dictionary.Entry<K, V>> it = iterator();
-
-        while(it.hasNext()) {
-            Dictionary.Entry<K, V> item = it.next();
-            if(item.getKey().equals(key)) {
+    
+        for (Dictionary.Entry<K, V> item : this)
+        {
+            if (item.getKey().equals(key))
+            {
                 return item.getValue();
             }
         }
 
-        throw new Exception();
+        throw new NoSuchElementException();
     }
     
     @Override

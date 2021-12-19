@@ -6,7 +6,7 @@ public interface Dictionary<K, V> extends Iterable<Dictionary.Entry<K, V>>
     
     V remove(K key);
     
-    V get(K key) throws Exception;
+    V get(K key);
     
     boolean contains(K key);
     
