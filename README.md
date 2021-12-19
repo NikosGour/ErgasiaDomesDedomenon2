@@ -8,7 +8,7 @@
   - it22118
 <hr>
 
-## Circular Queue
+## Open Addressing Hash Table
 ### Quick Start
 ```shell
 mvn clean
