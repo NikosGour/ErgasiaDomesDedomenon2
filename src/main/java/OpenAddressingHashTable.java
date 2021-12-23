@@ -1,16 +1,19 @@
+import jdk.jshell.spi.ExecutionControl;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
+public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
 {
-    private static final int DEFAULT_CAPACITY = 64;
-    public Entry<K,V>[] table;
-    int size;
+    private static final int           DEFAULT_CAPACITY = 64;
+    public               Entry<K, V>[] table;
+    int      size;
     Byte[][] hashingTable;
-    int b;
+    int      b;
     
+    @SuppressWarnings("unused")
     public OpenAddressingHashTable()
     {
         this(DEFAULT_CAPACITY);
@@ -19,13 +22,16 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     @SuppressWarnings("unchecked")
     public OpenAddressingHashTable(int capacity)
     {
-        table = (Entry<K, V>[]) Array.newInstance(Entry.class, capacity);
-        size = 0;
-        b = (int)(Math.log(table.length) / Math.log(2));
+        int n = isPower(capacity) ? capacity : (int) Math.pow(2 , Math.ceil(Math.log(capacity) / Math.log(2)));
+        table        = (Entry<K, V>[]) Array.newInstance(Entry.class , n);
+        size         = 0;
+        b            = (int) (Math.log(table.length) / Math.log(2));
         hashingTable = createHashingTable();
         
     }
+    
     @Override
+    @TestedAndFunctional
     public void put(K key , V value)
     {
         if (size == table.length)
@@ -40,6 +46,10 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
                 table[index] = new Entry<>(key , value);
                 size++;
                 return;
+            } else if (table[index].getKey().equals(key))
+            {
+                table[index].setValue(value);
+                return;
             } else
             {
                 index = (index + 1) % table.length;
@@ -48,15 +58,42 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     }
     
     @Override
+    @TestedAndFunctional
     public V remove(K key)
     {
-        return null;
+        if (size <= table.length / 4)
+        {
+            halfCapacity();
+        }
+        if (! this.contains(key))
+        {
+            throw new NoSuchElementException();
+        }
+        int index = hash(key);
+        V returnValue;
+        while (true)
+        {
+            if (table[index] != null)
+            {
+                if (table[index].getKey().equals(key))
+                {
+                    returnValue  = table[index].getValue();
+                    table[index] = null;
+                    size--;
+                    return returnValue;
+                }
+            }
+            index = (index + 1) % table.length;
+            
+        }
+        
     }
     
     @Override
+    @TestedAndFunctional
     public V get(K key) throws NoSuchElementException
     {
-    
+        
         for (Dictionary.Entry<K, V> item : this)
         {
             if (item.getKey().equals(key))
@@ -64,34 +101,40 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
                 return item.getValue();
             }
         }
-
+        
         throw new NoSuchElementException();
     }
     
     @Override
+    @TestedAndFunctional
     public boolean contains(K key)
     {
-        try {
+        try
+        {
             get(key);
             return true;
-        } catch(Exception e) {
+        } catch (Exception e)
+        {
             return false;
         }
     }
     
     @Override
+    @TestedAndFunctional
     public boolean isEmpty()
     {
         return size == 0;
     }
     
     @Override
+    @TestedAndFunctional
     public int size()
     {
         return size;
     }
     
     @Override
+    @TestedAndFunctional
     public void clear()
     {
         Arrays.fill(table , null);
@@ -99,30 +142,33 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     }
     
     @Override
+    @TestedAndFunctional
     public Iterator<Dictionary.Entry<K, V>> iterator()
     {
         return new HashIterator();
     }
     
+    
     private void doubleCapacity()
     {
-    
     }
+    
     private void halfCapacity()
     {
     
     }
+    
     public int hash(K key)
     {
         String temp = Integer.toBinaryString(key.hashCode());
-        String keyHashBits_s = String.format("%32s", temp).replace(' ', '0');
+        String keyHashBits_s = String.format("%32s" , temp).replace(' ' , '0');
         Byte[] keyHashBits = new Byte[32];
         for (int i = 0; i < keyHashBits.length; i++)
         {
-            keyHashBits[i] = Byte.parseByte( Character.toString(keyHashBits_s.charAt(i)));
+            keyHashBits[i] = Byte.parseByte(Character.toString(keyHashBits_s.charAt(i)));
         }
         String returnValue_s = "";
-    
+        
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < this.hashingTable.length; i++)
         {
@@ -135,8 +181,9 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
             returnValue_s += sum % 2;
         }
         
-        return Integer.parseInt(returnValue_s, 2);
+        return Integer.parseInt(returnValue_s , 2);
     }
+    
     private void rehash()
     {
     
@@ -153,20 +200,34 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
             }
         }
         return hashingTable;
+        
+    }
     
+    @TestedAndFunctional
+    public static boolean isPower(int n)
+    {
+        double x = Math.log(n) / Math.log(2);
+        return (int) (Math.ceil(x)) == (int) (Math.floor(x));
     }
     
     private static class Entry<K, V> implements Dictionary.Entry<K, V>
     {
         private K key;
         private V value;
-    
+        
         public Entry(K key , V value)
         {
             this.key   = key;
             this.value = value;
         }
-    
+        
+        
+        @Override
+        public String toString()
+        {
+            return "Entry{" + "key=" + key + ", value=" + value + '}';
+        }
+        
         @Override
         public K getKey()
         {
@@ -178,33 +239,42 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
         {
             return value;
         }
+        
+        public void setValue(V value)
+        {
+            this.value = value;
+        }
     }
-
-    private class HashIterator implements Iterator<Dictionary.Entry<K, V>> {
+    
+    private class HashIterator implements Iterator<Dictionary.Entry<K, V>>
+    {
         private int i;
-
-        public HashIterator() {
+        
+        public HashIterator()
+        {
             this.i = 0;
         }
-
+        
         @Override
-        public boolean hasNext() {
-            while(i < table.length) {
-                if(table[i] != null) {
+        @TestedAndFunctional
+        public boolean hasNext()
+        {
+            while (i < table.length)
+            {
+                if (table[i] != null)
+                {
                     return true;
                 }
                 i++;
             }
-
             return false;
         }
-
+        
         @Override
-        public Entry<K, V> next() {
-            if(!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            return table[i];
+        @TestedAndFunctional
+        public Entry<K, V> next()
+        {
+            return table[i++];
         }
     }
 }
