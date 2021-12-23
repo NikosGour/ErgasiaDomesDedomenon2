@@ -5,11 +5,12 @@ import java.util.NoSuchElementException;
 
 public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
 {
-    private static final int           DEFAULT_CAPACITY = 64;
-    public               Entry<K, V>[] table;
-    int      size;
-    Byte[][] hashingTable;
-    int      b;
+    private static final int DEFAULT_CAPACITY = 64;
+    
+    private Entry<K, V>[] table;
+    private int           size;
+    private Byte[][]      hashingTable;
+    private int           b;
     
     @SuppressWarnings("unused")
     public OpenAddressingHashTable()
