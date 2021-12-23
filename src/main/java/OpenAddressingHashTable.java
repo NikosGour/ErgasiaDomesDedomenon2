@@ -1,5 +1,3 @@
-import jdk.jshell.spi.ExecutionControl;
-
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -26,7 +24,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         table        = (Entry<K, V>[]) Array.newInstance(Entry.class , n);
         size         = 0;
         b            = (int) (Math.log(table.length) / Math.log(2));
-        hashingTable = createHashingTable();
+        hashingTable = createNewHashingTable();
         
     }
     
@@ -34,10 +32,12 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @TestedAndFunctional
     public void put(K key , V value)
     {
-        if (size == table.length)
-        {
-            doubleCapacity();
-        }
+        rehashIfnessecary();
+        put_us(key , value);
+    }
+    
+    private void put_us(K key , V value)
+    {
         int index = hash(key);
         while (true)
         {
@@ -61,10 +61,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @TestedAndFunctional
     public V remove(K key)
     {
-        if (size <= table.length / 4)
-        {
-            halfCapacity();
-        }
+        rehashIfnessecary();
         if (! this.contains(key))
         {
             throw new NoSuchElementException();
@@ -149,15 +146,6 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     }
     
     
-    private void doubleCapacity()
-    {
-    }
-    
-    private void halfCapacity()
-    {
-    
-    }
-    
     public int hash(K key)
     {
         String temp = Integer.toBinaryString(key.hashCode());
@@ -184,12 +172,33 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         return Integer.parseInt(returnValue_s , 2);
     }
     
-    private void rehash()
+    private void rehashIfnessecary()
     {
-    
+        int newSize;
+        if (size >= table.length)
+        {
+            newSize = table.length * 2;
+        } else if (size <= table.length / 4 && table.length > 2)
+        {
+            newSize = table.length / 2;
+        } else
+        {
+            return;
+        }
+        OpenAddressingHashTable<K, V> newTable = new OpenAddressingHashTable<>(newSize);
+        
+        for (Dictionary.Entry<K, V> item : this)
+        {
+            newTable.put_us(item.getKey() , item.getValue());
+        }
+        
+        this.b            = newTable.b;
+        this.hashingTable = newTable.hashingTable;
+        this.table        = newTable.table;
+        this.size         = newTable.size;
     }
     
-    private Byte[][] createHashingTable()
+    private Byte[][] createNewHashingTable()
     {
         Byte[][] hashingTable = new Byte[b][32];
         for (int i = 0; i < hashingTable.length; i++)
@@ -210,6 +219,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         return (int) (Math.ceil(x)) == (int) (Math.floor(x));
     }
     
+    //region Inner Classes
     private static class Entry<K, V> implements Dictionary.Entry<K, V>
     {
         private K key;
@@ -277,4 +287,5 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
             return table[i++];
         }
     }
+    //endregion
 }
