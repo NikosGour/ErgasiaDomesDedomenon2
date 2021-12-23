@@ -223,7 +223,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     }
     
     //region Inner Classes
-    private static class Entry<K, V> implements Dictionary.Entry<K, V>
+    public static class Entry<K, V> implements Dictionary.Entry<K, V>
     {
         private K key;
         private V value;
