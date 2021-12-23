@@ -28,7 +28,23 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     @Override
     public void put(K key , V value)
     {
-    
+        if (size == table.length)
+        {
+            doubleCapacity();
+        }
+        int index = hash(key);
+        while (true)
+        {
+            if (table[index] == null)
+            {
+                table[index] = new Entry<>(key , value);
+                size++;
+                return;
+            } else
+            {
+                index = (index + 1) % table.length;
+            }
+        }
     }
     
     @Override
@@ -144,7 +160,13 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     {
         private K key;
         private V value;
-        
+    
+        public Entry(K key , V value)
+        {
+            this.key   = key;
+            this.value = value;
+        }
+    
         @Override
         public K getKey()
         {
