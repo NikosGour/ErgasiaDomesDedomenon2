@@ -32,10 +32,11 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @TestedAndFunctional
     public void put(K key , V value)
     {
-        rehashIfnessecary();
+        rehashIfNecessary();
         put_us(key , value);
     }
     
+    @TestedAndFunctional
     private void put_us(K key , V value)
     {
         int index = hash(key);
@@ -61,7 +62,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @TestedAndFunctional
     public V remove(K key)
     {
-        rehashIfnessecary();
+        rehashIfNecessary();
         if (! this.contains(key))
         {
             throw new NoSuchElementException();
@@ -145,7 +146,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         return new HashIterator();
     }
     
-    
+    @TestedAndFunctional
     public int hash(K key)
     {
         String temp = Integer.toBinaryString(key.hashCode());
@@ -172,7 +173,8 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         return Integer.parseInt(returnValue_s , 2);
     }
     
-    private void rehashIfnessecary()
+    @TestedAndFunctional
+    private void rehashIfNecessary()
     {
         int newSize;
         if (size >= table.length)
