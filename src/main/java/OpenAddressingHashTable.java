@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -5,18 +6,24 @@ import java.util.NoSuchElementException;
 public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
 {
     private static final int DEFAULT_CAPACITY = 64;
-    Entry<K,V>[] table;
+    public Entry<K,V>[] table;
     int size;
+    Byte[][] hashingTable;
+    int b;
     
     public OpenAddressingHashTable()
     {
         this(DEFAULT_CAPACITY);
     }
+    
     @SuppressWarnings("unchecked")
     public OpenAddressingHashTable(int capacity)
     {
-        table = (Entry<K, V>[]) new Object[capacity];
+        table = (Entry<K, V>[]) Array.newInstance(Entry.class, capacity);
         size = 0;
+        b = (int)(Math.log(table.length) / Math.log(2));
+        hashingTable = createHashingTable();
+        
     }
     @Override
     public void put(K key , V value)
@@ -89,12 +96,47 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K,V>
     {
     
     }
-    private int hash(K key)
+    public int hash(K key)
     {
-        return 0;
+        String temp = Integer.toBinaryString(key.hashCode());
+        String keyHashBits_s = String.format("%32s", temp).replace(' ', '0');
+        Byte[] keyHashBits = new Byte[32];
+        for (int i = 0; i < keyHashBits.length; i++)
+        {
+            keyHashBits[i] = Byte.parseByte( Character.toString(keyHashBits_s.charAt(i)));
+        }
+        String returnValue_s = "";
+    
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < this.hashingTable.length; i++)
+        {
+            int sum = 0;
+            for (int j = 0; j < this.hashingTable[i].length; j++)
+            {
+                sum += this.hashingTable[i][j] * keyHashBits[j];
+            }
+            //noinspection StringConcatenationInLoop
+            returnValue_s += sum % 2;
+        }
+        
+        return Integer.parseInt(returnValue_s, 2);
     }
     private void rehash()
     {
+    
+    }
+    
+    private Byte[][] createHashingTable()
+    {
+        Byte[][] hashingTable = new Byte[b][32];
+        for (int i = 0; i < hashingTable.length; i++)
+        {
+            for (int j = 0; j < hashingTable[i].length; j++)
+            {
+                hashingTable[i][j] = (byte) (Math.random() * 2);
+            }
+        }
+        return hashingTable;
     
     }
     
