@@ -291,4 +291,16 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         }
     }
     //endregion
+    
+    //region Test Methods
+    public int getLength()
+    {
+        return table.length;
+    }
+    
+    public Entry<K, V>[] getTable()
+    {
+        return table;
+    }
+    //endregion
 }
