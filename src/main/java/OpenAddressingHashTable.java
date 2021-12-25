@@ -173,6 +173,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         
         return Integer.parseInt(returnValue_s , 2);
     }
+  
     
     @TestedAndFunctional
     private void rehashIfNecessary()
@@ -307,6 +308,32 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         }
 
         return -1;
+    }
+    
+    public String hash_debug(K key)
+    {
+        String temp = Integer.toBinaryString(key.hashCode());
+        String keyHashBits_s = String.format("%32s" , temp).replace(' ' , '0');
+        Byte[] keyHashBits = new Byte[32];
+        for (int i = 0; i < keyHashBits.length; i++)
+        {
+            keyHashBits[i] = Byte.parseByte(Character.toString(keyHashBits_s.charAt(i)));
+        }
+        String returnValue_s = "";
+        
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < this.hashingTable.length; i++)
+        {
+            int sum = 0;
+            for (int j = 0; j < this.hashingTable[i].length; j++)
+            {
+                sum += this.hashingTable[i][j] * keyHashBits[j];
+            }
+            //noinspection StringConcatenationInLoop
+            returnValue_s += sum % 2;
+        }
+        
+        return returnValue_s;
     }
     //endregion
 }
