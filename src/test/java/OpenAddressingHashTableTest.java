@@ -56,25 +56,9 @@ class OpenAddressingHashTableTest
         
         assertEquals(table.hash("Aa"), table.hash("BB"));
         assertEquals(2, table.size());
-        
-        var x = table.getTable();
     
-        int indexAa = 0 , indexBB = 0;
-        for (int i = 0; i < x.length; i++)
-        {
-            if (x[i] != null)
-            {
-                if (x[i].getKey().equals("Aa"))
-                {
-                    indexAa = i;
-                }
-                else if (x[i].getKey().equals("BB"))
-                {
-                    indexBB = i;
-                }
-            }
-        }
-        
+        int indexAa = table.getIndex("Aa") , indexBB = table.getIndex("BB");
+
         assertEquals((indexAa + 1) % table.getLength(), indexBB);
         
     }

@@ -297,10 +297,16 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     {
         return table.length;
     }
-    
-    public Entry<K, V>[] getTable()
-    {
-        return table;
+
+    public int getIndex(K key) {
+        int length = getLength();
+        for (int i = 0; i < length; i++) {
+            if(table[i] != null) {
+                if (table[i].getKey().equals(key)) return i;
+            }
+        }
+
+        return -1;
     }
     //endregion
 }
