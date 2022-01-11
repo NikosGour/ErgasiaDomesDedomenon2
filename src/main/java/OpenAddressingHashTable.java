@@ -41,22 +41,34 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     private void put_us(K key , V value)
     {
         int index = hash(key);
-        while (true)
-        {
-            if (table[index] == null)
-            {
-                table[index] = new Entry<>(key , value);
-                size++;
-                return;
-            } else if (table[index].getKey().equals(key))
-            {
+//        while (true)
+//        {
+//            if (table[index] == null)
+//            {
+//                table[index] = new Entry<>(key , value);
+//                size++;
+//                return;
+//            } else if (table[index].getKey().equals(key))
+//            {
+//                table[index].setValue(value);
+//                return;
+//            } else
+//            {
+//                index = (index + 1) % table.length;
+//            }
+//        }
+
+        while(table[index] != null) {
+            if(table[index].getKey().equals(key)) {
                 table[index].setValue(value);
                 return;
-            } else
-            {
-                index = (index + 1) % table.length;
             }
+            index = (index + 1) % table.length;
         }
+
+
+        table[index] = new Entry<>(key, value);
+        size++;
     }
     
     @Override
