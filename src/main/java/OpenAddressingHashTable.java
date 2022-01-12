@@ -41,22 +41,6 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     private void put_us(K key , V value)
     {
         int index = hash(key);
-//        while (true)
-//        {
-//            if (table[index] == null)
-//            {
-//                table[index] = new Entry<>(key , value);
-//                size++;
-//                return;
-//            } else if (table[index].getKey().equals(key))
-//            {
-//                table[index].setValue(value);
-//                return;
-//            } else
-//            {
-//                index = (index + 1) % table.length;
-//            }
-//        }
 
         while(table[index] != null) {
             if(table[index].getKey().equals(key)) {
@@ -80,24 +64,34 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         {
             throw new NoSuchElementException();
         }
+
         int index = hash(key);
-        V returnValue;
-        while (true)
-        {
-            if (table[index] != null)
-            {
-                if (table[index].getKey().equals(key))
-                {
-                    returnValue  = table[index].getValue();
-                    table[index] = null;
-                    size--;
-                    return returnValue;
-                }
-            }
-            index = (index + 1) % table.length;
-            
+
+        while(!table[index].getKey().equals(key)) {
+            index = (index +1) % table.length;
         }
-        
+
+        V returnValue = table[index].getValue();
+
+        table[index] = null;
+
+        int j = (index + 1) % table.length;
+
+        while(table[j] != null) {
+            int pos = hash(table[j].getKey());
+
+            if(pos <= index) {
+                Entry<K, V> temp = table[j];
+                table[j] = table[index];
+                table[index] = temp;
+                index = j;
+            }
+
+            j = (j + 1) % table.length;
+        }
+
+        size--;
+        return returnValue;
     }
     
     @Override
