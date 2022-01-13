@@ -21,7 +21,10 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @SuppressWarnings("unchecked")
     public OpenAddressingHashTable(int capacity)
     {
-        int n = isPower(capacity) ? capacity : (int) Math.pow(2 , Math.ceil(Math.log(capacity) / Math.log(2)));
+        int n = isPower(capacity) && capacity != 0 ?
+                capacity :
+                (int) Math.pow(2 , Math.ceil(Math.log(capacity) / Math.log(2)));
+        
         table        = (Entry<K, V>[]) Array.newInstance(Entry.class , n);
         size         = 0;
         b            = (int) (Math.log(table.length) / Math.log(2));
@@ -232,8 +235,8 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     //region Inner Classes
     public static class Entry<K, V> implements Dictionary.Entry<K, V>
     {
-        private K key;
-        private V value;
+        private final K key;
+        private       V value;
         
         public Entry(K key , V value)
         {
