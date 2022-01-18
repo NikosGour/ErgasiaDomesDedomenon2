@@ -42,7 +42,10 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     {
         int index = hash(key);
 
+        int foundDummy = -1;
         while(table[index] != null) {
+            if((table[index].getKey() == null && table[index].getValue() == null) && foundDummy == -1) foundDummy = index;
+
             if(table[index].getKey().equals(key)) {
                 table[index].setValue(value);
                 return;
@@ -50,6 +53,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
             index = (index + 1) % table.length;
         }
 
+        if(foundDummy != -1) index = foundDummy;
 
         table[index] = new Entry<>(key, value);
         size++;
@@ -67,31 +71,49 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
 
         int index = hash(key);
 
-        while(!table[index].getKey().equals(key)) {
+        while(true) {
+            if(table[index].getKey() == null) {
+                index = (index +1) % table.length;
+                continue;
+            }
+
+            if(table[index].getKey().equals(key)) break;
+
             index = (index +1) % table.length;
         }
 
         V returnValue = table[index].getValue();
 
-        table[index] = null;
-
-        int j = (index + 1) % table.length;
-
-        while(table[j] != null) {
-            int pos = hash(table[j].getKey());
-
-            if(pos <= index) {
-                Entry<K, V> temp = table[j];
-                table[j] = table[index];
-                table[index] = temp;
-                index = j;
-            }
-
-            j = (j + 1) % table.length;
-        }
+        table[index] = new Entry<>(null, null);
 
         size--;
         return returnValue;
+
+//        while(!table[index].getKey().equals(key)) {
+//            index = (index +1) % table.length;
+//        }
+//
+//        V returnValue = table[index].getValue();
+//
+//        table[index] = null;
+//
+//        int j = (index + 1) % table.length;
+//
+//        while(table[j] != null) {
+//            int pos = hash(table[j].getKey());
+//
+//            if(pos <= index) {
+//                Entry<K, V> temp = table[j];
+//                table[j] = table[index];
+//                table[index] = temp;
+//                index = j;
+//            }
+//
+//            j = (j + 1) % table.length;
+//        }
+//
+//        size--;
+//        return returnValue;
     }
     
     @Override
@@ -283,6 +305,11 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
             {
                 if (table[i] != null)
                 {
+                    if((table[i].getKey() == null && table[i].getValue() == null)) {
+                        i++;
+                        continue;
+                    }
+
                     return true;
                 }
                 i++;
@@ -294,6 +321,8 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         @TestedAndFunctional
         public Entry<K, V> next()
         {
+            if(!hasNext()) throw new NoSuchElementException();
+
             return table[i++];
         }
     }

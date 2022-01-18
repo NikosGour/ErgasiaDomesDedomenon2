@@ -9,7 +9,7 @@ class OpenAddressingHashTableTest
     void testBasicFunctionality()
     {
         int size = 16;
-        OpenAddressingHashTable<Integer, Integer> table = new OpenAddressingHashTable<>(size);
+        OpenAddressingHashTable<Integer, Integer> table = new OpenAddressingHashTable<>(64);
         assertTrue(table.isEmpty());
         assertEquals(0, table.size());
         
