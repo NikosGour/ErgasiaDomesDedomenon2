@@ -43,6 +43,8 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @TestedAndFunctional
     private void put_us(K key , V value)
     {
+        if(key == null) throw new NoSuchElementException();
+
         int index = hash(key);
 
         int foundDummy = -1;
@@ -97,13 +99,17 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @TestedAndFunctional
     public V get(K key) throws NoSuchElementException
     {
-        
-        for (Dictionary.Entry<K, V> item : this)
-        {
-            if (item.getKey().equals(key))
-            {
-                return item.getValue();
+        int index = hash(key);
+
+        while(table[index] != null) {
+            if(table[index].getKey() == null) {
+                index = (index +1) % table.length;
+                continue;
             }
+
+            if(table[index].getKey().equals(key)) return table[index].getValue();
+
+            index = (index +1) % table.length;
         }
         
         throw new NoSuchElementException();
