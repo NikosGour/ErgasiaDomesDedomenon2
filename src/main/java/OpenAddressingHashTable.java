@@ -9,7 +9,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     
     private Entry<K, V>[] table;
     private int           size;
-    private Byte[][]      hashingTable;
+    private byte[][]      hashingTable;
     private int           b;
     
     @SuppressWarnings("unused")
@@ -21,14 +21,27 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @SuppressWarnings("unchecked")
     public OpenAddressingHashTable(int capacity)
     {
-        int n = isPower(capacity) && capacity != 0 ?
-                capacity :
-                (int) Math.pow(2 , Math.ceil(Math.log(capacity) / Math.log(2)));
+        int n = isPower(capacity) && capacity != 0 ? capacity : (int) Math.pow(2 ,
+                                                                               Math.ceil(Math.log(
+                                                                                       capacity) /
+                                                                                         Math.log(2)));
         
         table        = (Entry<K, V>[]) Array.newInstance(Entry.class , n);
         size         = 0;
         b            = (int) (Math.log(table.length) / Math.log(2));
         hashingTable = createNewHashingTable();
+        
+        //          FileHandler fh = null;
+        //        try
+        //        {
+        //            fh = new FileHandler("log.txt");
+        //        } catch (
+        //    IOException e)
+        //        {
+        //            e.printStackTrace();
+        //        }
+        //        fh.setFormatter(new SimpleFormatter());
+        //        logger.addHandler(fh);
         
     }
     
@@ -43,24 +56,27 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     @TestedAndFunctional
     private void put_us(K key , V value)
     {
-        if(key == null) throw new NoSuchElementException();
-
+        if (key == null) throw new NoSuchElementException();
+        
         int index = hash(key);
-
-        int foundDummy = -1;
-        while(table[index] != null) {
-            if((table[index].getKey() == null && table[index].getValue() == null) && foundDummy == -1) foundDummy = index;
-
-            if(table[index].getKey().equals(key)) {
+        
+        int foundDummy = - 1;
+        while (table[index] != null)
+        {
+            if ((table[index].getKey() == null && table[index].getValue() == null) &&
+                foundDummy == - 1) foundDummy = index;
+            
+            if (table[index].getKey().equals(key))
+            {
                 table[index].setValue(value);
                 return;
             }
             index = (index + 1) % table.length;
         }
-
-        if(foundDummy != -1) index = foundDummy;
-
-        table[index] = new Entry<>(key, value);
+        
+        if (foundDummy != - 1) index = foundDummy;
+        
+        table[index] = new Entry<>(key , value);
         size++;
     }
     
@@ -73,24 +89,27 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         {
             throw new NoSuchElementException();
         }
-
+        
         int index = hash(key);
-
-        while(true) {
-            if(table[index].getKey() == null) {
-                index = (index +1) % table.length;
+        //        logger.info("Removing " + key + " from index " + index);
+        
+        while (true)
+        {
+            if (table[index].getKey() == null)
+            {
+                index = (index + 1) % table.length;
                 continue;
             }
-
-            if(table[index].getKey().equals(key)) break;
-
-            index = (index +1) % table.length;
+            
+            if (table[index].getKey().equals(key)) break;
+            
+            index = (index + 1) % table.length;
         }
-
+        
         V returnValue = table[index].getValue();
-
-        table[index] = new Entry<>(null, null);
-
+        
+        table[index] = new Entry<>(null , null);
+        
         size--;
         return returnValue;
     }
@@ -100,16 +119,18 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     public V get(K key) throws NoSuchElementException
     {
         int index = hash(key);
-
-        while(table[index] != null) {
-            if(table[index].getKey() == null) {
-                index = (index +1) % table.length;
+        
+        while (table[index] != null)
+        {
+            if (table[index].getKey() == null)
+            {
+                index = (index + 1) % table.length;
                 continue;
             }
-
-            if(table[index].getKey().equals(key)) return table[index].getValue();
-
-            index = (index +1) % table.length;
+            
+            if (table[index].getKey().equals(key)) return table[index].getValue();
+            
+            index = (index + 1) % table.length;
         }
         
         throw new NoSuchElementException();
@@ -162,11 +183,17 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     public int hash(K key)
     {
         String temp = Integer.toBinaryString(key.hashCode());
-        String keyHashBits_s = String.format("%32s" , temp).replace(' ' , '0');
-        Byte[] keyHashBits = new Byte[32];
+        //        String keyHashBits_s = String.format("%32s" , temp).replace(' ' , '0');
+        
+        StringBuilder keyHashBits_s = new StringBuilder(temp);
+        for (int i = 0; i < 32 - temp.length(); i++)
+        {
+            keyHashBits_s.insert(0 , '0');
+        }
+        byte[] keyHashBits = new byte[32];
         for (int i = 0; i < keyHashBits.length; i++)
         {
-            keyHashBits[i] = Byte.parseByte(Character.toString(keyHashBits_s.charAt(i)));
+            keyHashBits[i] = (byte) (keyHashBits_s.charAt(i));
         }
         String returnValue_s = "";
         
@@ -184,7 +211,7 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         
         return Integer.parseInt(returnValue_s , 2);
     }
-  
+    
     
     @TestedAndFunctional
     private void rehashIfNecessary()
@@ -213,9 +240,9 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         this.size         = newTable.size;
     }
     
-    private Byte[][] createNewHashingTable()
+    private byte[][] createNewHashingTable()
     {
-        Byte[][] hashingTable = new Byte[b][32];
+        byte[][] hashingTable = new byte[b][32];
         for (int i = 0; i < hashingTable.length; i++)
         {
             for (int j = 0; j < hashingTable[i].length; j++)
@@ -288,11 +315,12 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
             {
                 if (table[i] != null)
                 {
-                    if((table[i].getKey() == null && table[i].getValue() == null)) {
+                    if ((table[i].getKey() == null && table[i].getValue() == null))
+                    {
                         i++;
                         continue;
                     }
-
+                    
                     return true;
                 }
                 i++;
@@ -304,8 +332,8 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
         @TestedAndFunctional
         public Entry<K, V> next()
         {
-            if(!hasNext()) throw new NoSuchElementException();
-
+            if (! hasNext()) throw new NoSuchElementException();
+            
             return table[i++];
         }
     }
@@ -316,26 +344,34 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
     {
         return table.length;
     }
-
-    public int getIndex(K key) {
+    
+    public int getIndex(K key)
+    {
         int length = getLength();
-        for (int i = 0; i < length; i++) {
-            if(table[i] != null) {
+        for (int i = 0; i < length; i++)
+        {
+            if (table[i] != null)
+            {
                 if (table[i].getKey().equals(key)) return i;
             }
         }
-
-        return -1;
+        
+        return - 1;
     }
     
     public String hash_debug(K key)
     {
         String temp = Integer.toBinaryString(key.hashCode());
-        String keyHashBits_s = String.format("%32s" , temp).replace(' ' , '0');
-        Byte[] keyHashBits = new Byte[32];
+        //        String keyHashBits_s = String.format("%32s" , temp).replace(' ' , '0');
+        StringBuilder keyHashBits_s = new StringBuilder(temp);
+        for (int i = 0; i < 32 - temp.length(); i++)
+        {
+            keyHashBits_s.insert(0 , '0');
+        }
+        byte[] keyHashBits = new byte[32];
         for (int i = 0; i < keyHashBits.length; i++)
         {
-            keyHashBits[i] = Byte.parseByte(Character.toString(keyHashBits_s.charAt(i)));
+            keyHashBits[i] = (byte)keyHashBits_s.charAt(i);
         }
         String returnValue_s = "";
         
