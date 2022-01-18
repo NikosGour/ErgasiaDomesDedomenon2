@@ -91,32 +91,6 @@ public class OpenAddressingHashTable<K, V> implements Dictionary<K, V>
 
         size--;
         return returnValue;
-
-//        while(!table[index].getKey().equals(key)) {
-//            index = (index +1) % table.length;
-//        }
-//
-//        V returnValue = table[index].getValue();
-//
-//        table[index] = null;
-//
-//        int j = (index + 1) % table.length;
-//
-//        while(table[j] != null) {
-//            int pos = hash(table[j].getKey());
-//
-//            if(pos <= index) {
-//                Entry<K, V> temp = table[j];
-//                table[j] = table[index];
-//                table[index] = temp;
-//                index = j;
-//            }
-//
-//            j = (j + 1) % table.length;
-//        }
-//
-//        size--;
-//        return returnValue;
     }
     
     @Override

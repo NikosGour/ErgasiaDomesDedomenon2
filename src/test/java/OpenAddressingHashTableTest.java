@@ -8,7 +8,7 @@ class OpenAddressingHashTableTest
     @Test
     void testBasicFunctionality()
     {
-        int size = 16;
+        int size = 16384;
         OpenAddressingHashTable<Integer, Integer> table = new OpenAddressingHashTable<>(64);
         assertTrue(table.isEmpty());
         assertEquals(0, table.size());
@@ -38,7 +38,7 @@ class OpenAddressingHashTableTest
     @Test
     void testLinearProbing()
     {
-        int size = 15;
+        int size = 16383;
         OpenAddressingHashTable<String, Integer> table = new OpenAddressingHashTable<>(size);
         
         assertFalse(OpenAddressingHashTable.isPower(size));
@@ -62,7 +62,7 @@ class OpenAddressingHashTableTest
     @Test
     void testRehashing()
     {
-        int size = 16;
+        int size = 16384;
         OpenAddressingHashTable<Integer, Integer> table = new OpenAddressingHashTable<>(size);
 
         for (int i = 0; i < size; i++)
